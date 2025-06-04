@@ -1,196 +1,291 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>PDF Viewer с обрезным полем</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script> 
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-        }
-        .page-info {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-        canvas {
-            border: 1px solid #999;
-            max-width: 100%;
-            display: block;
-            margin-top: 10px;
-        }
-        .preview-title {
-            margin-top: 15px;
-            font-weight: bold;
-        }
-        .crop-size {
-            margin-top: 8px;
-            color: red;
-            font-weight: bold;
-        }
-        .controls {
-            margin-bottom: 10px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>PDF Viewer — Минимальная версия</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script> 
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f9f9f9;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 360px;
+      max-width: 100%;
+      margin: auto;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      font-size: 18px;
+      margin-top: 0;
+    }
+
+    input[type="file"] {
+      display: block;
+      margin: 10px auto 20px;
+      width: 100%;
+    }
+
+    canvas {
+      border: 1px solid #ccc;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 10px auto;
+    }
+
+    .preview-title {
+      text-align: center;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    .input-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 5px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .input-group {
+      flex: 1;
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 4px;
+      color: #333;
+      font-size: 13px;
+    }
+
+    .input-group input {
+      width: 60px;
+      padding: 4px;
+      text-align: center;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+
+    .input-group .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .input-group button {
+      font-size: 12px;
+      padding: 2px 6px;
+      cursor: pointer;
+    }
+
+    .format-row {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .format-label {
+      color: #555;
+      font-weight: normal;
+    }
+
+    .format-value {
+      color: black;
+      font-weight: bold;
+    }
+
+    button.preview-btn {
+      display: block;
+      margin: 15px auto 0;
+      padding: 8px 16px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    button.preview-btn:hover {
+      background-color: #005a99;
+    }
+  </style>
 </head>
 <body>
 
-<h2>Загрузите PDF:</h2>
-<input type="file" id="pdf-file" accept="application/pdf">
+<div class="container">
 
-<div class="controls">
-    <label for="crop-margin">Размер обрезного поля:</label>
-    <select id="crop-margin">
-        <option value="2" selected>2 мм</option>
-        <option value="3">3 мм</option>
-        <option value="4">4 мм</option>
-        <option value="5">5 мм</option>
-    </select>
+  <h2>Загрузите PDF:</h2>
+  <input type="file" id="pdf-file" accept="application/pdf">
+
+  <div class="preview-title">Превью страницы (обрезное поле):</div>
+
+  <!-- Вылеты на обрез -->
+  <div class="input-row">
+    <div class="input-group">
+      <label for="top-margin">Сверху</label>
+      <input type="number" id="top-margin" value="2" step="1">
+      <div class="btn-group">
+        <button onclick="changeValue('top-margin', 1)">+1</button>
+        <button onclick="changeValue('top-margin', 10)">+10</button>
+        <button onclick="changeValue('top-margin', -1)">−1</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="bottom-margin">Снизу</label>
+      <input type="number" id="bottom-margin" value="2" step="1">
+      <div class="btn-group">
+        <button onclick="changeValue('bottom-margin', 1)">+1</button>
+        <button onclick="changeValue('bottom-margin', 10)">+10</button>
+        <button onclick="changeValue('bottom-margin', -1)">−1</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="left-margin">Слева</label>
+      <input type="number" id="left-margin" value="2" step="1">
+      <div class="btn-group">
+        <button onclick="changeValue('left-margin', 1)">+1</button>
+        <button onclick="changeValue('left-margin', 10)">+10</button>
+        <button onclick="changeValue('left-margin', -1)">−1</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="right-margin">Справа</label>
+      <input type="number" id="right-margin" value="2" step="1">
+      <div class="btn-group">
+        <button onclick="changeValue('right-margin', 1)">+1</button>
+        <button onclick="changeValue('right-margin', 10)">+10</button>
+        <button onclick="changeValue('right-margin', -1)">−1</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="preview-btn" id="preview-btn">Обновить превью</button>
+
+  <!-- Форматы -->
+  <div class="format-row">
+    <span class="format-label">Дообрезной формат:</span><br>
+    <span class="format-value" id="before-crop">...</span>
+  </div>
+  <div class="format-row">
+    <span class="format-label">Обрезной формат:</span><br>
+    <span class="format-value" id="after-crop">...</span>
+  </div>
+
+  <!-- Canvas -->
+  <canvas id="page-canvas" width="300" height="400"
+          style="display: block; margin: 10px auto; border: 1px solid #ccc;"></canvas>
+
 </div>
 
-<div id="output"></div>
-
 <script>
-    let cropMarginMM = 2;
+  const canvas = document.getElementById('page-canvas');
+  const ctx = canvas.getContext('2d');
 
-    document.getElementById('crop-margin').addEventListener('change', function () {
-        cropMarginMM = parseFloat(this.value);
-        reRenderAllPages();
-    });
+  let currentPage = null;
 
-    let currentPDF = null;
+  // Загрузка PDF
+  document.getElementById('pdf-file').addEventListener('change', async function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-    document.getElementById('pdf-file').addEventListener('change', async function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async function () {
+      const pdfDoc = await pdfjsLib.getDocument({ data: reader.result }).promise;
+      currentPage = await pdfDoc.getPage(1);
 
-        const reader = new FileReader();
-        reader.onload = async function () {
-            currentPDF = await pdfjsLib.getDocument({ data: reader.result }).promise;
-            document.getElementById('output').innerHTML = `<p>Всего страниц: ${currentPDF.numPages}</p>`;
-            reRenderAllPages();
-        };
-        reader.readAsArrayBuffer(file);
-    });
+      renderPageWithCropMarks(currentPage);
+    };
+    reader.readAsArrayBuffer(file);
+  });
 
-    async function reRenderAllPages() {
-        if (!currentPDF) return;
-
-        const output = document.getElementById('output');
-        const container = output.querySelector('.page-info');
-
-        // Очищаем все страницы
-        const pagesContainer = document.createElement('div');
-        const header = output.querySelector('p');
-        if (header) pagesContainer.appendChild(header);
-
-        for (let i = 1; i <= currentPDF.numPages; i++) {
-            const page = await currentPDF.getPage(i);
-            const div = showPageSizeWithPreview(page, i);
-            pagesContainer.appendChild(div);
-        }
-
-        output.innerHTML = '';
-        output.appendChild(pagesContainer);
+  // Обновление превью
+  document.getElementById('preview-btn').addEventListener('click', () => {
+    if (currentPage) {
+      renderPageWithCropMarks(currentPage);
     }
+  });
 
-    function mmToPx(mm, dpi = 300) {
-        return (mm * dpi) / 25.4;
+  // Изменение значения поля
+  function changeValue(id, delta) {
+    const input = document.getElementById(id);
+    let val = parseFloat(input.value || 0);
+    input.value = Math.max(0, val + delta); // Ограничиваем минимумом 0
+    if (currentPage) {
+      renderPageWithCropMarks(currentPage);
     }
+  }
 
-    function showPageSizeWithPreview(page, pageNumber) {
-        const viewport = page.getViewport({ scale: 300 / 72 });
+  function mmToPx(mm, dpi = 300) {
+    return (mm * dpi) / 25.4;
+  }
 
-        const pageWidthPx = viewport.width;
-        const pageHeightPx = viewport.height;
+  async function renderPageWithCropMarks(page) {
+    const viewport = page.getViewport({ scale: 300 / 72 });
 
-        const widthMM = (pageWidthPx * 25.4) / (viewport.scale * 72);
-        const heightMM = (pageHeightPx * 25.4) / (viewport.scale * 72);
+    canvas.width = Math.round(viewport.width);
+    canvas.height = Math.round(viewport.height);
 
-        const container = document.createElement('div');
-        container.className = 'page-info';
+    const renderCtx = {
+      canvasContext: ctx,
+      viewport: viewport
+    };
 
-        container.innerHTML = `
-            <strong>Страница ${pageNumber}</strong><br>
-            Размер в миллиметрах: <strong>${widthMM.toFixed(1)} × ${heightMM.toFixed(1)} мм</strong><br>
-            Обрезной формат: <span id="crop-format-${pageNumber}">...</span><br>
-            <div class="preview-title">Превью страницы (обрезное поле):</div>
-            <canvas id="canvas-${pageNumber}" width="${Math.round(pageWidthPx)}" height="${Math.round(pageHeightPx)}"></canvas>
-            <div class="crop-size" id="crop-size-${pageNumber}">Обрезной формат: ... мм</div>
-        `;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    await page.render(renderCtx).promise;
 
-        const canvas = document.createElement('canvas');
-        canvas.id = `canvas-${pageNumber}`;
-        canvas.width = Math.round(pageWidthPx);
-        canvas.height = Math.round(pageHeightPx);
-        container.querySelector('.preview-title').after(canvas);
+    const top = parseFloat(document.getElementById('top-margin').value) || 0;
+    const bottom = parseFloat(document.getElementById('bottom-margin').value) || 0;
+    const left = parseFloat(document.getElementById('left-margin').value) || 0;
+    const right = parseFloat(document.getElementById('right-margin').value) || 0;
 
-        const cropSizeDiv = document.createElement('div');
-        cropSizeDiv.className = 'crop-size';
-        cropSizeDiv.id = `crop-size-${pageNumber}`;
-        container.appendChild(cropSizeDiv);
+    const widthMM = (canvas.width * 25.4) / (viewport.scale * 72);
+    const heightMM = (canvas.height * 25.4) / (viewport.scale * 72);
 
-        const ctx = canvas.getContext('2d');
-        const renderContext = {
-            canvasContext: ctx,
-            viewport: viewport
-        };
+    const innerWidthMM = widthMM - left - right;
+    const innerHeightMM = heightMM - top - bottom;
 
-        page.render(renderContext).promise.then(() => {
-            drawCropMarks(ctx, viewport, pageNumber);
-        });
+    const marginLeftPx = mmToPx(left, 300);
+    const marginTopPx = mmToPx(top, 300);
+    const innerWidthPx = mmToPx(innerWidthMM, 300);
+    const innerHeightPx = mmToPx(innerHeightMM, 300);
 
-        return container;
-    }
+    // Отображение форматов
+    document.getElementById('before-crop').textContent = `${widthMM.toFixed(1)} × ${heightMM.toFixed(1)} мм`;
+    document.getElementById('after-crop').textContent = `${Math.round(innerWidthMM)} × ${Math.round(innerHeightMM)} мм`;
 
-    function drawCropMarks(ctx, viewport, pageNumber) {
-        const scaleX = viewport.scale;
-        const scaleY = viewport.scale;
+    // Рамка обрезного поля (в 2 раза толще)
+    ctx.setLineDash([5, 5]);
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 4; // было 2 → стало 4
+    ctx.strokeRect(marginLeftPx, marginTopPx, innerWidthPx, innerHeightPx);
+    ctx.setLineDash([]);
 
-        const pageWidthPx = viewport.width;
-        const pageHeightPx = viewport.height;
-
-        const widthMM = (pageWidthPx * 25.4) / (scaleX * 72);
-        const heightMM = (pageHeightPx * 25.4) / (scaleY * 72);
-
-        const cropWidthMM = widthMM - cropMarginMM * 2;
-        const cropHeightMM = heightMM - cropMarginMM * 2;
-
-        const innerWidthPx = (cropWidthMM * scaleX * 72) / 25.4;
-        const innerHeightPx = (cropHeightMM * scaleY * 72) / 25.4;
-
-        const marginX = (cropMarginMM * scaleX * 72) / 25.4;
-        const marginY = (cropMarginMM * scaleY * 72) / 25.4;
-
-        // Рамка
-        ctx.setLineDash([5, 5]);
-        ctx.strokeStyle = 'red';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(marginX, marginY, innerWidthPx, innerHeightPx);
-        ctx.setLineDash([]);
-
-        // Текст внутри рамки
-        ctx.fillStyle = 'red';
-        ctx.font = 'bold 16px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-
-        const text = `${Math.round(cropWidthMM)} × ${Math.round(cropHeightMM)} мм`;
-        ctx.fillText(text, marginX + innerWidthPx / 2, marginY + innerHeightPx / 2);
-
-        // Обновляем текст под изображением
-        const cropSizeDiv = document.getElementById(`crop-size-${pageNumber}`);
-        if (cropSizeDiv) {
-            cropSizeDiv.textContent = `Обрезной формат: ${Math.round(cropWidthMM)} × ${Math.round(cropHeightMM)} мм`;
-        }
-
-        const cropFormatSpan = document.getElementById(`crop-format-${pageNumber}`);
-        if (cropFormatSpan) {
-            cropFormatSpan.textContent = `${Math.round(cropWidthMM)} × ${Math.round(cropHeightMM)} мм`;
-        }
-    }
+    // Текст внутри рамки
+    ctx.fillStyle = 'red';
+    ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const text = `${Math.round(innerWidthMM)} × ${Math.round(innerHeightMM)} мм`;
+    ctx.fillText(text, marginLeftPx + innerWidthPx / 2, marginTopPx + innerHeightPx / 2);
+  }
 </script>
 
 </body>
