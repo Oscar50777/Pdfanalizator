@@ -1,9 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
   <title>PDF Viewer — Минимальная версия</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.14.305/pdf.min.js"></script> 
   <style>
     body {
@@ -15,8 +15,8 @@
     }
 
     .container {
-      width: 360px;
-      max-width: 100%;
+      width: 45%;
+      max-width: 600px;
       margin: auto;
       background: white;
       border: 1px solid #ddd;
@@ -31,10 +31,13 @@
       margin-top: 0;
     }
 
-    input[type="file"] {
+    #pdf-file {
       display: block;
-      margin: 10px auto 20px;
       width: 100%;
+      padding: 8px;
+      font-size: 14px;
+      text-align: center;
+      margin: 10px 0 20px 0;
     }
 
     canvas {
@@ -54,15 +57,15 @@
     .input-row {
       display: flex;
       justify-content: space-between;
-      gap: 5px;
+      gap: 10px;
       margin-top: 10px;
-      font-size: 13px;
+      flex-wrap: wrap;
     }
 
     .input-group {
       flex: 1;
+      min-width: 130px;
       text-align: center;
-      font-size: 13px;
     }
 
     .input-group label {
@@ -79,20 +82,28 @@
       border: 1px solid #aaa;
       border-radius: 4px;
       font-size: 14px;
-      margin-bottom: 5px;
+      margin-bottom: 6px;
     }
 
-    .input-group .btn-group {
+    .btn-group {
       display: flex;
       justify-content: center;
       gap: 4px;
       margin-top: 4px;
     }
 
-    .input-group button {
+    .btn-group button {
       font-size: 12px;
-      padding: 2px 6px;
+      padding: 2px 4px;
       cursor: pointer;
+    }
+
+    .btn-group .small {
+      width: 30px;
+    }
+
+    .btn-group .large {
+      width: 50px;
     }
 
     .format-row {
@@ -111,7 +122,7 @@
       font-weight: bold;
     }
 
-    button.preview-btn {
+    .preview-btn {
       display: block;
       margin: 15px auto 0;
       padding: 8px 16px;
@@ -123,7 +134,7 @@
       cursor: pointer;
     }
 
-    button.preview-btn:hover {
+    .preview-btn:hover {
       background-color: #005a99;
     }
   </style>
@@ -133,7 +144,10 @@
 <div class="container">
 
   <h2>Загрузите PDF:</h2>
-  <input type="file" id="pdf-file" accept="application/pdf">
+  <!-- Центрированное поле выбора файла -->
+  <div style="text-align: center;">
+    <input type="file" id="pdf-file" accept="application/pdf">
+  </div>
 
   <div class="preview-title">Превью страницы (обрезное поле):</div>
 
@@ -143,36 +157,36 @@
       <label for="top-margin">Сверху</label>
       <input type="number" id="top-margin" value="2" step="1">
       <div class="btn-group">
-        <button onclick="changeValue('top-margin', 1)">+1</button>
-        <button onclick="changeValue('top-margin', 10)">+10</button>
-        <button onclick="changeValue('top-margin', -1)">−1</button>
+        <button class="small" onclick="changeValue('top-margin', 1)">+1</button>
+        <button class="large" onclick="changeValue('top-margin', 10)">+10</button>
+        <button class="small" onclick="changeValue('top-margin', -1)">−1</button>
       </div>
     </div>
     <div class="input-group">
       <label for="bottom-margin">Снизу</label>
       <input type="number" id="bottom-margin" value="2" step="1">
       <div class="btn-group">
-        <button onclick="changeValue('bottom-margin', 1)">+1</button>
-        <button onclick="changeValue('bottom-margin', 10)">+10</button>
-        <button onclick="changeValue('bottom-margin', -1)">−1</button>
+        <button class="small" onclick="changeValue('bottom-margin', 1)">+1</button>
+        <button class="large" onclick="changeValue('bottom-margin', 10)">+10</button>
+        <button class="small" onclick="changeValue('bottom-margin', -1)">−1</button>
       </div>
     </div>
     <div class="input-group">
       <label for="left-margin">Слева</label>
       <input type="number" id="left-margin" value="2" step="1">
       <div class="btn-group">
-        <button onclick="changeValue('left-margin', 1)">+1</button>
-        <button onclick="changeValue('left-margin', 10)">+10</button>
-        <button onclick="changeValue('left-margin', -1)">−1</button>
+        <button class="small" onclick="changeValue('left-margin', 1)">+1</button>
+        <button class="large" onclick="changeValue('left-margin', 10)">+10</button>
+        <button class="small" onclick="changeValue('left-margin', -1)">−1</button>
       </div>
     </div>
     <div class="input-group">
       <label for="right-margin">Справа</label>
       <input type="number" id="right-margin" value="2" step="1">
       <div class="btn-group">
-        <button onclick="changeValue('right-margin', 1)">+1</button>
-        <button onclick="changeValue('right-margin', 10)">+10</button>
-        <button onclick="changeValue('right-margin', -1)">−1</button>
+        <button class="small" onclick="changeValue('right-margin', 1)">+1</button>
+        <button class="large" onclick="changeValue('right-margin', 10)">+10</button>
+        <button class="small" onclick="changeValue('right-margin', -1)">−1</button>
       </div>
     </div>
   </div>
@@ -223,7 +237,7 @@
     }
   });
 
-  // Изменение значения поля
+  // Изменение значения
   function changeValue(id, delta) {
     const input = document.getElementById(id);
     let val = parseFloat(input.value || 0);
@@ -271,10 +285,10 @@
     document.getElementById('before-crop').textContent = `${widthMM.toFixed(1)} × ${heightMM.toFixed(1)} мм`;
     document.getElementById('after-crop').textContent = `${Math.round(innerWidthMM)} × ${Math.round(innerHeightMM)} мм`;
 
-    // Рамка обрезного поля (в 2 раза толще)
+    // Рамка обрезного поля
     ctx.setLineDash([5, 5]);
     ctx.strokeStyle = 'red';
-    ctx.lineWidth = 4; // было 2 → стало 4
+    ctx.lineWidth = 4;
     ctx.strokeRect(marginLeftPx, marginTopPx, innerWidthPx, innerHeightPx);
     ctx.setLineDash([]);
 
