@@ -31,13 +31,18 @@
       margin-top: 0;
     }
 
+    .file-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px 0 20px;
+    }
+
     #pdf-file {
-      display: block;
       width: 100%;
+      max-width: 300px;
       padding: 8px;
       font-size: 14px;
-      text-align: center;
-      margin: 10px 0 20px 0;
     }
 
     canvas {
@@ -144,8 +149,9 @@
 <div class="container">
 
   <h2>Загрузите PDF:</h2>
-  <!-- Центрированное поле выбора файла -->
-  <div style="text-align: center;">
+
+  <!-- Точное центрирование поля выбора файла -->
+  <div class="file-wrapper">
     <input type="file" id="pdf-file" accept="application/pdf">
   </div>
 
